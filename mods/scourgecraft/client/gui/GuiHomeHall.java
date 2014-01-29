@@ -36,7 +36,6 @@ public class GuiHomeHall extends GuiScreen {
 	private EntityPlayer playerPar1;
 	private ExtendedPlayer extPlayer;
 	private GuiTextField txtTownName;
-	private World world;
 	private String townName;
 	private int xCoord;
 	private int yCoord;
@@ -45,13 +44,13 @@ public class GuiHomeHall extends GuiScreen {
 	
 	private GuiButton btnUpgradeLevel;
 	private GuiButton btnBuildHome;
+	private GuiButton btnShowRaids;
 	
-	public GuiHomeHall(EntityPlayer player, TileEntityHomeHall tile, World par1World, int x, int y, int z) {
+	public GuiHomeHall(EntityPlayer player, TileEntityHomeHall tile, int x, int y, int z) {
 		playerPar1 = player;
 		xCoord = x;
 		yCoord = y;
 		zCoord = z;
-		world = par1World;
 		tileHome = tile;
 	}
 
@@ -65,10 +64,14 @@ public class GuiHomeHall extends GuiScreen {
 		btnUpgradeLevel = new GuiButton(1, this.width - 124, 60, 115, 20, "Upgrade Level " + (tileHome.getLevel() + 1));
 		btnUpgradeLevel.drawButton = false;
 		this.buttonList.add(btnUpgradeLevel);
+		
 		btnBuildHome = new GuiButton(0, 195, this.height - 50, 65, 20, "Build");
 		btnBuildHome.drawButton = false;
 		this.buttonList.add(btnBuildHome);
-
+		
+		btnShowRaids = new GuiButton(5, this.width - 124, 38, 115, 20, "Raids");
+		btnShowRaids.drawButton = false;
+		this.buttonList.add(btnShowRaids);
 		this.buttonList.add(new GuiButton(10, this.width - 50, 5, 45, 20, "Close"));
 	}
 	
@@ -87,6 +90,7 @@ public class GuiHomeHall extends GuiScreen {
 			drawString(this.fontRenderer, "Gold Producers " + tileHome.getBuildingCount(ScourgeCraftCore.configBlocks.goldProducerID) + "/" + TileEntityGoldProducer.getTotalMaxByTownLevel(tileHome.getLevel()), 10, 70, 0x66CC66);
 			drawString(this.fontRenderer, "Gold Storages " + tileHome.getBuildingCount(ScourgeCraftCore.configBlocks.goldStorageID) + "/" + TileEntityGoldStorage.getTotalMaxByTownLevel(tileHome.getLevel()), 10, 80, 0x66CC66);
 			drawString(this.fontRenderer, "Total Gold " + tileHome.getTotalResourceCount(ScourgeCraftCore.configBlocks.goldStorageID), 10, 90, 0x66CC66);
+			btnShowRaids.drawButton = true; 
 			
 			if (tileHome.hasNextLevel())
 			{
@@ -176,8 +180,12 @@ public class GuiHomeHall extends GuiScreen {
 				tileHome.build();
 				PacketDispatcher.sendPacketToServer(new Packet2CreateHome(home).makePacket());
 				
-				playerPar1.openGui(ScourgeCraftCore.instance, 1, world, xCoord, yCoord, zCoord);
+				playerPar1.openGui(ScourgeCraftCore.instance, 1, tileHome.worldObj, xCoord, yCoord, zCoord);
 			}
+		}
+		else if (button.id == 5) //Show Raids
+		{
+			playerPar1.openGui(ScourgeCraftCore.instance, 5, tileHome.worldObj, xCoord, yCoord, zCoord);
 		}
 		else if (button.id == 10)
 		{

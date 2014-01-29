@@ -5,6 +5,7 @@ import java.util.Map;
 
 import mods.scourgecraft.ScourgeCraftCore;
 import mods.scourgecraft.inventory.ContainerDefault;
+import mods.scourgecraft.inventory.ContainerHomeBank;
 import mods.scourgecraft.tileentity.TileEntityGoldProducer;
 import mods.scourgecraft.tileentity.TileEntityGoldStorage;
 import mods.scourgecraft.tileentity.TileEntityHomeHall;
@@ -39,6 +40,8 @@ public class GuiHandler implements IGuiHandler
 			case 2: return new ContainerDefault();
 			case 3: return new ContainerDefault();
 			case 4: return new ContainerDefault();
+			case 5: return new ContainerDefault();
+			case 6: return new ContainerHomeBank(player.inventory, world.getBlockTileEntity(x, y, z));
 		}
 	}
 
@@ -48,11 +51,13 @@ public class GuiHandler implements IGuiHandler
 		switch (ID)
 		{
 			default: return null;
-			case 0: return new GuiHomeHall(player, (TileEntityHomeHall)world.getBlockTileEntity(x, y, z), world, x, y, z);
+			case 0: return new GuiHomeHall(player, (TileEntityHomeHall)world.getBlockTileEntity(x, y, z), x, y, z);
 			case 1: return new GuiBuildingInProgress((TileEntityScourgeBuilding)world.getBlockTileEntity(x, y, z), x, y, z);
 			case 2: return new GuiGoldProducer((TileEntityGoldProducer)world.getBlockTileEntity(x, y, z), x, y, z);
 			case 3: return new GuiGoldStorage((TileEntityGoldStorage)world.getBlockTileEntity(x, y, z), x, y, z);
 			case 4: return new GuiRaidCenter(player, (TileEntityRaidCenter)world.getBlockTileEntity(x, y, z), x, y, z);
+			case 5: return new GuiShowRaids(player);
+			case 6: return new GuiHomeBank(player.inventory, world.getBlockTileEntity(x, y, z));
 		}
 	}
  

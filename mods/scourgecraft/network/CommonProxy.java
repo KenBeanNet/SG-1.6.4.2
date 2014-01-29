@@ -7,13 +7,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mods.scourgecraft.ScourgeCraftCore;
+import mods.scourgecraft.client.gui.GuiHandler;
 import mods.scourgecraft.entity.EntityCannon;
+import mods.scourgecraft.inventory.ContainerHomeBank;
 import mods.scourgecraft.player.ExtendedPlayer;
 import mods.scourgecraft.tick.ServerTickHandler;
+import mods.scourgecraft.tileentity.TileEntityBank;
 import mods.scourgecraft.tileentity.TileEntityCannon;
 import mods.scourgecraft.tileentity.TileEntityGoldProducer;
 import mods.scourgecraft.tileentity.TileEntityGoldStorage;
 import mods.scourgecraft.tileentity.TileEntityHomeHall;
+import mods.scourgecraft.tileentity.TileEntityRaidCenter;
 import mods.scourgecraft.tileentity.TileEntityScourgeBuilding;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,23 +32,9 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-public class CommonProxy implements IGuiHandler {
+public class CommonProxy {
 	
 	private static final Map<String, ExtendedPlayer> extendedEntityData = new HashMap<String, ExtendedPlayer>();
-	
-	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world,
-			int x, int y, int z) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world,
-			int x, int y, int z) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	public void registerHandlers()
     {
@@ -58,6 +48,9 @@ public class CommonProxy implements IGuiHandler {
     	GameRegistry.registerTileEntity(TileEntityGoldProducer.class, ScourgeCraftCore.modid + "TEGoldProducer");
     	GameRegistry.registerTileEntity(TileEntityGoldStorage.class, ScourgeCraftCore.modid + "TEGoldStorage");
     	GameRegistry.registerTileEntity(TileEntityCannon.class, ScourgeCraftCore.modid + "TECannon");
+    	GameRegistry.registerTileEntity(TileEntityBank.class, ScourgeCraftCore.modid + "TEBank");
+    	GameRegistry.registerTileEntity(TileEntityRaidCenter.class, ScourgeCraftCore.modid + "TERaidCenter");
+    	
     }
 	
 	public File getMinecraftDir()

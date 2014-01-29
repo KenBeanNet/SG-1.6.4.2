@@ -37,6 +37,8 @@ public class BlockGoldProducer extends BlockScourgeResource {
 	@Override
 	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLivingBase, ItemStack par6ItemStack)
 	{
+		super.onBlockPlacedBy(par1World, par2, par3, par4, par5EntityLivingBase, par6ItemStack);
+		
 		TileEntityGoldProducer teGold = (TileEntityGoldProducer)par1World.getBlockTileEntity(par2, par3, par4);
 		if (par5EntityLivingBase instanceof EntityPlayer)
 			teGold.setOwner(((EntityPlayer)par5EntityLivingBase).username);

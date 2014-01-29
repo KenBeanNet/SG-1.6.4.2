@@ -1,5 +1,6 @@
 package mods.scourgecraft.data;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,12 +11,14 @@ import java.util.List;
 import java.util.logging.Level;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import mods.scourgecraft.ScourgeCraftCore;
 import mods.scourgecraft.helpers.Home;
+import mods.scourgecraft.helpers.json.JSONObject;
 import mods.scourgecraft.network.packet.Packet1HomeInfo;
 import mods.scourgecraft.player.ExtendedPlayer;
 import mods.scourgecraft.tileentity.TileEntityGoldProducer;
@@ -26,13 +29,15 @@ import mods.scourgecraft.tileentity.TileEntityScourgeResource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.MathHelper;
-import net.sourceforge.yamlbeans.YamlException;
-import net.sourceforge.yamlbeans.YamlReader;
-import net.sourceforge.yamlbeans.YamlWriter;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.ForgeChunkManager;
+import net.minecraftforge.common.ForgeChunkManager.Ticket;
 
 public class HomeManager {
 
 	public static HashMap<String, Home> homeList = new HashMap<String, Home>();
+	public static Gson gson = new Gson();
 	
 	public static void loadHomes()
 	{
@@ -40,7 +45,7 @@ public class HomeManager {
 		file.mkdir();
 		System.out.print("[ScourgeCraft] Loading Homes.....");
 		for (final File fileEntry : file.listFiles()) {
-			loadHome(fileEntry.getName().replace(".yml", ""));
+			loadHome(fileEntry.getName().replace(".json", ""));
 	    }
 		System.out.println("Loaded " + homeList.size() + " home(s)");
 	}
@@ -48,32 +53,32 @@ public class HomeManager {
 	public static void createHome(Home home)
 	{
 		System.out.print("[ScourgeCraft] Creating new home for player " + home.ownerUsername + "......");
-        File playerFile = new File(ScourgeCraftCore.proxy.getMinecraftDir() + "/Homes", home.ownerUsername + ".yml");
 
-        YamlWriter writer = null;
         try
         {
-            writer = new YamlWriter(new FileWriter(playerFile));
-            writer.getConfig().setClassTag("Home", Home.class);
-        }
-        catch (IOException e)
-        {
-        	e.printStackTrace();
-        }
-            try {
-				writer.write(home);
-			} catch (YamlException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-            try {
-				writer.close();
-			} catch (YamlException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        	FileWriter writer = new FileWriter(ScourgeCraftCore.proxy.getMinecraftDir() + "/Homes/" + home.ownerUsername + ".json");
+        	writer.write(gson.toJson(home));
+        	writer.close();
             homeList.put(home.ownerUsername, home);
-            System.out.println("Created");
+        }
+        catch (IOException e) {
+    		e.printStackTrace();
+    	}
+	}
+	
+	public static void saveHome(Home home)
+	{
+		try
+        {
+        	FileWriter writer = new FileWriter(ScourgeCraftCore.proxy.getMinecraftDir() + "/Homes/" + home.ownerUsername + ".json");
+        	String longT = gson.toJson(home);
+        	System.out.println(longT);
+        	writer.write(longT);
+        	writer.close();
+        }
+        catch (IOException e) {
+    		e.printStackTrace();
+    	}
 	}
 	
 	public static void playerLogin(EntityPlayer player)
@@ -87,36 +92,20 @@ public class HomeManager {
 	
 	private static void loadHome(String username)
 	{
-		File homeFile = new File(ScourgeCraftCore.proxy.getMinecraftDir() + "/Homes", username + ".yml");
-		
-		YamlReader reader = null;
 		Home home = null;
 		
 		try
         {
-            reader = new YamlReader(new FileReader(homeFile));
-            reader.getConfig().setClassTag("Home", Home.class);
+			BufferedReader br = new BufferedReader(new FileReader(ScourgeCraftCore.proxy.getMinecraftDir() + "/Homes/" + username + ".json"));
+			home = gson.fromJson(br, Home.class);
+			br.close();
         }
         catch (FileNotFoundException e)
         {
             e.printStackTrace();
-        }
-        try
-        {
-        	home = reader.read(Home.class);
-        }
-        catch (YamlException e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            reader.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        } catch (IOException e) {
+			e.printStackTrace();
+		}
         homeList.put(username, home);
 	}
 	
@@ -247,13 +236,21 @@ public class HomeManager {
 		return homeList.containsKey(username);
 	}
 	
-	public static void startEndRaid(EntityPlayer par1Player, boolean startRaid)
+	public static void startEndRaid(String par1Player, boolean startRaid)
 	{
-		Home h = HomeManager.getHomeByPlayerName(par1Player.username);
+		Home h = HomeManager.getHomeByPlayerName(par1Player);
+		TileEntityHomeHall teHome = null;
 		
 		if (h != null)
 		{
-			TileEntityHomeHall teHome = (TileEntityHomeHall)par1Player.worldObj.getBlockTileEntity(h.xCoord, h.yCoord, h.zCoord);
+			for (WorldServer ws : MinecraftServer.getServer().worldServers)
+	    	{
+				if (ws.provider.dimensionId == h.dimensionId)
+				{
+					teHome = (TileEntityHomeHall) ws.getBlockTileEntity(h.xCoord, h.yCoord, h.zCoord);
+					break;
+				}
+	    	}
 			
 			if (teHome != null)
 			{
@@ -264,11 +261,10 @@ public class HomeManager {
 						teResource.startRaid();
 					else
 						teResource.endRaid();
-					par1Player.addChatMessage("You can steal " + teResource.getStealAmount());
 				}
 			}
 		}
 		else
-			FMLLog.log(Level.SEVERE, "User %s is starting a raid but doesn't know about his own home!", par1Player.username);
+			FMLLog.log(Level.SEVERE, "User %s is starting a raid but server doesn't know about his home!", par1Player);
 	}
 }

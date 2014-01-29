@@ -1,9 +1,12 @@
 package mods.scourgecraft;
 
+import net.minecraftforge.common.ForgeChunkManager;
+import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.MinecraftForge;
 import mods.scourgecraft.client.gui.GuiHandler;
 import mods.scourgecraft.config.ConfigBlocks;
 import mods.scourgecraft.creative.CreativeTabBlock;
+import mods.scourgecraft.data.ChunkLoadingHandler;
 import mods.scourgecraft.data.HomeManager;
 import mods.scourgecraft.data.RaidManager;
 import mods.scourgecraft.gen.GenerateHome;
@@ -90,7 +93,8 @@ public class ScourgeCraftCore
     	MinecraftForge.EVENT_BUS.register(playerEventListener);
     	
     	GameRegistry.registerWorldGenerator(new GenerateHome());
-
+    	
+    	ForgeChunkManager.setForcedChunkLoadingCallback(this, new ChunkLoadingHandler());
     }
     
     @EventHandler

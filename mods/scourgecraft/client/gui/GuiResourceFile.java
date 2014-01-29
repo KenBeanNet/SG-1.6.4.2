@@ -10,4 +10,5 @@ public class GuiResourceFile {
 	public static ResourceLocation factionBlue = new ResourceLocation(ScourgeCraftCore.modid.toLowerCase(), "textures/gui/liqus.png");
 	public static ResourceLocation factionGreen = new ResourceLocation(ScourgeCraftCore.modid.toLowerCase(), "textures/gui/Eternus.png");
 	public static ResourceLocation factionYellow = new ResourceLocation(ScourgeCraftCore.modid.toLowerCase(), "textures/gui/Shinora.png");
+	public static ResourceLocation guiHomeBank = new ResourceLocation(ScourgeCraftCore.modid.toLowerCase(), "textures/gui/mintstorage.png");
 }

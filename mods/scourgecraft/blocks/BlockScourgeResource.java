@@ -14,7 +14,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
-public class BlockScourgeResource  extends BlockContainer {
+public class BlockScourgeResource  extends BlockScourge {
 
 	protected BlockScourgeResource(int par1, Material par2Material) {
 		super(par1, par2Material);

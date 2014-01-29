@@ -24,6 +24,8 @@ public class ExtendedPlayer implements IExtendedEntityProperties
 	private final EntityPlayer player;
 	
 	private int vitality;
+	private int score;
+	private int killStreak;
 	
 
 	public ExtendedPlayer(EntityPlayer player)
@@ -63,6 +65,39 @@ public class ExtendedPlayer implements IExtendedEntityProperties
 		return vitality;
 	}
 	
+	public void addScore(int amount)
+	{
+		score += amount;
+		if (score >= 1000)
+		{
+			score -= 1000;
+			addVitality(1);
+		}
+	}
+	
+	public void addKillStreak()
+	{
+		killStreak++;
+	}
+	public int getKillStreak()
+	{
+		return killStreak;
+	}
+	public void setKillStreak(int par1KillStreak)
+	{
+		killStreak = par1KillStreak;
+	}
+	
+	public int getScore()
+	{
+		return score;
+	}
+	
+	public void setScore(int par1Score)
+	{
+		score = par1Score;
+	}
+	
 	public final void setVitality(int vit)
 	{
 		vitality = vit;
@@ -76,12 +111,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties
 	@Override
 	public void saveNBTData(NBTTagCompound compound) {
 		compound.setInteger("Vitality", this.vitality);
+		compound.setInteger("Score", this.score);
 	}
 
 	@Override
 	public void loadNBTData(NBTTagCompound compound) {
 		this.vitality = (compound.getInteger("Vitality"));
-		System.out.println("[ScourgeCraft] Loaded Vitality from NBT. Vitality = " + this.vitality);
+		this.score = (compound.getInteger("Score"));
 	}
 
 	@Override

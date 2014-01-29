@@ -37,12 +37,14 @@ public class TileEntityScourgeBuilding extends TileEntity
 	public static final String NBT_TIME_LEFT = "TimeLeft";
 	public static final String NBT_OWNER_NAME = "Owner";
 	public static final String NBT_LEVEL = "Level";
+	public static final String NBT_DIRECTION = "Direction";
 	
 	private String owner;
 	protected int buildTime;
 	protected int timeLeft;
 	protected int delay;
 	protected int level;
+	private int direction;
 	protected boolean sentBuildCommands = false;
 	
 	public TileEntityScourgeBuilding(int par1BuildTime)
@@ -113,6 +115,7 @@ public class TileEntityScourgeBuilding extends TileEntity
 		buildTime = nbt.getInteger(NBT_BUILD_TIME);
 		timeLeft = nbt.getInteger(NBT_TIME_LEFT);
 		level = nbt.getInteger(NBT_LEVEL);
+		direction = nbt.getInteger(NBT_DIRECTION);
 	}
 	
 	public void writeToNBT(NBTTagCompound nbt)
@@ -123,6 +126,7 @@ public class TileEntityScourgeBuilding extends TileEntity
 		nbt.setInteger(NBT_BUILD_TIME, buildTime);
 		nbt.setInteger(NBT_TIME_LEFT, timeLeft);
 		nbt.setInteger(NBT_LEVEL, level);
+		nbt.setInteger(NBT_DIRECTION, direction);
 	}
 	
 
@@ -140,6 +144,11 @@ public class TileEntityScourgeBuilding extends TileEntity
 	{
 		return level;
 	}
+	
+	public void setDirection(int var1) { this.direction = var1; }
+    public int getDirection() { return this.direction; }
+
+
 	
 	@Override
 	public Packet getDescriptionPacket()

@@ -47,23 +47,11 @@ public class Packet5StartRaid extends ScourgePacket {
     @Override
     protected void execute(EntityPlayer player, Side side) {
             if (side.isServer()) {
-            	EntityPlayer defend = null;
-            	for (WorldServer ws : MinecraftServer.getServer().worldServers)
+            	if (RaidManager.canRaid(player, defender))
             	{
-            		defend = ws.getPlayerEntityByName(defender);
-            		if (defend != null)
-            			break;
+                	Raid r = RaidManager.startRaid(player, defender);
+                	PacketDispatcher.sendPacketToAllPlayers(new Packet6RaidInfo(r).makePacket());
             	}
-            	if (defend != null)
-            	{
-            		if (RaidManager.canRaid(player, defend))
-            		{
-                		Raid r = RaidManager.startRaid(player, defend);
-                		PacketDispatcher.sendPacketToAllPlayers(new Packet6RaidInfo(r).makePacket());
-            		}
-            	}
-            	else
-            		player.addChatMessage("[ScourgeCraft] Player " + defender + " must be online to start a raid");
             } 
     }
 }

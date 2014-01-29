@@ -6,6 +6,8 @@ import mods.scourgecraft.ScourgeCraftCore;
 import mods.scourgecraft.data.HomeManager;
 import mods.scourgecraft.data.RaidManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
@@ -17,7 +19,9 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 
 public class PlayerEventListener {
-	public static int VIT_FOR_PLAYER_KILL = 3;
+	public static int BASE_PLAYER_KILL = 100;
+	public static int BASE_PLAYER_KILL_KILL_STREAK = 50;
+	public static int BASE_NPC_KILL = 10;
 	
 	@ForgeSubscribe
     public void livingDies(LivingDeathEvent event)
@@ -27,15 +31,31 @@ public class PlayerEventListener {
 	@ForgeSubscribe
 	public void onEntityLivingDeath(LivingDeathEvent event)
 	{
-		if (event.source.getEntity() instanceof EntityPlayer && event.entity instanceof EntityPlayer)
+		if (event.source.getEntity() instanceof EntityPlayer)
 		{
 			ExtendedPlayer extAttacker = ExtendedPlayer.getExtendedPlayer((EntityPlayer)event.source.getEntity());
 			
-			extAttacker.addVitality(VIT_FOR_PLAYER_KILL);
-			((EntityPlayer)event.source.getEntity()).addChatMessage("You have recieved " + VIT_FOR_PLAYER_KILL + " Vitality Points for killing " + ((EntityPlayer)event.entity).username);
+			if (event.entity instanceof EntityPlayer)
+			{
+				extAttacker.addKillStreak();
+					
+				extAttacker.addScore(BASE_PLAYER_KILL);
+				((EntityPlayer)event.source.getEntity()).addChatMessage("[ScourgeCraft] You Killed " + ((EntityPlayer)event.entity).username + "! + " + BASE_PLAYER_KILL);
+
+				if (extAttacker.getKillStreak() >= 3)
+				{
+					extAttacker.addScore(BASE_PLAYER_KILL_KILL_STREAK);
+					((EntityPlayer)event.source.getEntity()).addChatMessage("[ScourgeCraft] Kill Streak! +" + BASE_PLAYER_KILL_KILL_STREAK);
+				}
+			}
+			else if (event.entity instanceof EntityMob)
+			{
+				extAttacker.addScore(BASE_PLAYER_KILL);
+				((EntityPlayer)event.source.getEntity()).addChatMessage("[ScourgeCraft] You Killed " + ((EntityMob)event.entity) + "! + " + BASE_NPC_KILL);
+			}
 		}
 		
-		if (event.entity instanceof EntityPlayer)
+		if (event.entity instanceof EntityPlayer) // Handles the death of a EntityPlayer so they regain the data upon respawn.
 		{
 			ExtendedPlayer.saveProxyData((EntityPlayer) event.entity);
 		}

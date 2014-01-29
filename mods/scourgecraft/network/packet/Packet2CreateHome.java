@@ -53,6 +53,7 @@ public class Packet2CreateHome extends ScourgePacket {
             if (side.isServer()) {
             	if (!HomeManager.homeList.containsKey(home.ownerUsername)) //Ensure player doesn't already have home.  Hack?
             	{
+            		home.dimensionId = player.worldObj.provider.dimensionId;
             		EntityPlayer remotePlayer = player.worldObj.getPlayerEntityByName(home.ownerUsername);
                     TileEntity te = remotePlayer.worldObj.getBlockTileEntity(home.xCoord, home.yCoord, home.zCoord);
                     if (te instanceof TileEntityHomeHall)

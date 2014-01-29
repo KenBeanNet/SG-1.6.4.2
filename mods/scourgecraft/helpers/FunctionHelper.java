@@ -15,6 +15,9 @@ public class FunctionHelper
      */
     public static void setPlayer(EntityPlayerMP player, WarpPoint p)
     {
+    	if (player == null)
+    		return;
+    	
             if (player.dimension != p.dim)
             {
                     MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, p.dim);
@@ -33,6 +36,9 @@ public class FunctionHelper
      */
     public static void setPlayer(EntityPlayerMP player, Point point, World world)
     {
+    	if (player == null)
+    		return;
+    	
             if (player.dimension != world.provider.dimensionId)
             {
                     MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, world.provider.dimensionId);

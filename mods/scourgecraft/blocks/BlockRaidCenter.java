@@ -18,7 +18,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
-public class BlockRaidCenter extends BlockContainer {
+public class BlockRaidCenter extends BlockScourge {
 
 	public BlockRaidCenter(int par1, Material par2Material) {
 		super(par1, par2Material);
@@ -30,11 +30,6 @@ public class BlockRaidCenter extends BlockContainer {
 	public TileEntity createNewTileEntity(World world) {
 		// TODO Auto-generated method stub
 		return new TileEntityRaidCenter();
-	}
-	
-	@Override
-	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLivingBase, ItemStack par6ItemStack)
-	{
 	}
 	
 	/**

@@ -1,24 +1,37 @@
 package mods.scourgecraft.tileentity;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 import com.google.common.collect.Lists;
 
+import cpw.mods.fml.common.FMLLog;
 import mods.scourgecraft.ScourgeCraftCore;
 import mods.scourgecraft.data.HomeManager;
 import mods.scourgecraft.tileentity.TileEntityScourgeBuilding.BuildingTask;
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeChunkManager;
+import net.minecraftforge.common.ForgeChunkManager.Ticket;
+import net.minecraftforge.common.ForgeChunkManager.Type;
 
 public class TileEntityHomeHall extends TileEntityScourgeBuilding
 {
 	public static final String HOME_NAME = "HomeName";
 	private String homeName = "";
+	
+	private Ticket chunkTicket;
 	
 	public TileEntityHomeHall()
 	{
@@ -225,5 +238,58 @@ public class TileEntityHomeHall extends TileEntityScourgeBuilding
 		return homeName;
 	}
 	
+	@Override
+    public void validate() {
+            super.validate();
+            if(!worldObj.isRemote && chunkTicket == null && !this.getOwner().isEmpty()) {
+                    Ticket ticket = ForgeChunkManager.requestTicket(ScourgeCraftCore.instance, worldObj, Type.NORMAL);
+                    if(ticket != null) {
+                            forceChunkLoading(ticket);
+                    }
+            }
+    }
+
+    @Override
+    public void invalidate() {
+            super.invalidate();
+            stopChunkLoading();
+    }
+    
+    public void forceChunkLoading(Ticket ticket) {
+        stopChunkLoading();
+        chunkTicket = ticket;
+        for(ChunkCoordIntPair coord : getLoadArea()) {
+        	FMLLog.log(Level.INFO, String.format("Force loading chunk %s in %s", coord, worldObj.provider.getClass()));
+                ForgeChunkManager.forceChunk(chunkTicket, coord);
+        }
+	}
 	
+	public void unforceChunkLoading() {
+	        for(Object obj : chunkTicket.getChunkList()) {
+	                ChunkCoordIntPair coord = (ChunkCoordIntPair) obj;
+	                ForgeChunkManager.unforceChunk(chunkTicket, coord);
+	        }
+	}
+	
+	public void stopChunkLoading() {
+	        if(chunkTicket != null) {
+	                ForgeChunkManager.releaseTicket(chunkTicket);
+	                chunkTicket = null;
+	        }
+	}
+	
+	public List<ChunkCoordIntPair> getLoadArea() {
+        List<ChunkCoordIntPair> loadArea = new LinkedList<ChunkCoordIntPair>();
+
+        for(int x = -1; x < 1 + 1; x++) {
+                for(int z = -1; z < 1 + 1; z++) {
+                        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair((xCoord >> 4) + x, (zCoord >> 4) + z);
+
+                        loadArea.add(chunkCoords);
+                }
+        }
+
+        return loadArea;
+	}
+
 }
